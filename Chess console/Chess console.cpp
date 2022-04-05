@@ -1,20 +1,43 @@
-﻿// Chess console.cpp : Этот файл содержит функцию "main". Здесь начинается и заканчивается выполнение программы.
-//
+﻿#include "Chess_game.h"
 
-#include <iostream>
-
-int main()
+ostream& Cell_prop::operator <<(ostream& os) const
 {
-    std::cout << "Hello World!\n";
+
 }
 
-// Запуск программы: CTRL+F5 или меню "Отладка" > "Запуск без отладки"
-// Отладка программы: F5 или меню "Отладка" > "Запустить отладку"
+Chess_game::Chess_game()
+{
+	start_new_game();
+	cout << "Игра началась, первыми ходят белые. Для совершения хода введите в одну строчку: 'e2 e4' - " << 
+			"где e2 - координата, которой соответствует фигура, которая ходит, а e4 - координата клетки, куда данная фигура ходит.";
+}
 
-// Советы по началу работы 
-//   1. В окне обозревателя решений можно добавлять файлы и управлять ими.
-//   2. В окне Team Explorer можно подключиться к системе управления версиями.
-//   3. В окне "Выходные данные" можно просматривать выходные данные сборки и другие сообщения.
-//   4. В окне "Список ошибок" можно просматривать ошибки.
-//   5. Последовательно выберите пункты меню "Проект" > "Добавить новый элемент", чтобы создать файлы кода, или "Проект" > "Добавить существующий элемент", чтобы добавить в проект существующие файлы кода.
-//   6. Чтобы снова открыть этот проект позже, выберите пункты меню "Файл" > "Открыть" > "Проект" и выберите SLN-файл.
+void Chess_game::start_new_game()
+{
+	chess_board[0][0] = chess_board[0][7] = Cell_prop(Ceil_Figure_color::White, Ceil_Figure_type::R);
+	chess_board[0][1] = chess_board[0][6] = Cell_prop(Ceil_Figure_color::White, Ceil_Figure_type::N);
+	chess_board[0][2] = chess_board[0][5] = Cell_prop(Ceil_Figure_color::White, Ceil_Figure_type::B);
+	chess_board[0][3] = Cell_prop(Ceil_Figure_color::White, Ceil_Figure_type::Q);
+	chess_board[0][4] = Cell_prop(Ceil_Figure_color::White, Ceil_Figure_type::K);
+	for (int i = 0; i < 8; i++)
+	{
+		chess_board[1][i] = Cell_prop(Ceil_Figure_color::White, Ceil_Figure_type::p);
+	}
+	for (int i = 2; i < 6; i++)
+	{
+		for (int j = 0; j < 8; j++)
+		{
+			chess_board[i][j] = Cell_prop(Ceil_Figure_color::none, Ceil_Figure_type::none);
+		}
+	}
+	for (int i = 0; i < 8; i++)
+	{
+		chess_board[6][i] = Cell_prop(Ceil_Figure_color::Black, Ceil_Figure_type::p);
+	}
+
+	chess_board[7][0] = chess_board[0][7] = Cell_prop(Ceil_Figure_color::Black, Ceil_Figure_type::R);
+	chess_board[7][1] = chess_board[0][6] = Cell_prop(Ceil_Figure_color::Black, Ceil_Figure_type::N);
+	chess_board[7][2] = chess_board[0][5] = Cell_prop(Ceil_Figure_color::Black, Ceil_Figure_type::B);
+	chess_board[7][3] = Cell_prop(Ceil_Figure_color::Black, Ceil_Figure_type::Q);
+	chess_board[7][4] = Cell_prop(Ceil_Figure_color::Black, Ceil_Figure_type::K);
+}
