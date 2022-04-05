@@ -2,7 +2,42 @@
 
 ostream& Cell_prop::operator <<(ostream& os) const
 {
+	if (this->figure_color == White) //Если фигура белая, то она отобразится черным текстом на белом фоне
+	{
+		system("color F0");
+	}
+	else							 //Если фигура черная, то она отобразится белым текстом на черном фоне
+	{
+		system("color 0F");
+	}
 
+	cout << " ";
+	switch (this->figure_type) //В зависимости от типа фигуры, выводим соответвующую ей букву
+	{
+	case K:
+		cout << "K";
+		break;
+	case Q:
+		cout << "Q";
+		break;
+	case N:
+		cout << "N";
+		break;
+	case B:
+		cout << "B";
+		break;
+	case R:
+		cout << "R";
+		break;
+	case p:
+		cout << "p";
+		break;
+	default:
+		cout << " ";
+		break;
+	}
+
+	cout << " ";
 }
 
 Chess_game::Chess_game()

@@ -2,8 +2,10 @@
 #ifndef CHESS_GAME_H
 #define CHESS_GAME_H
 
+
 #include <array>
 #include <iostream>
+#include <string>
 
 using namespace std;
 
