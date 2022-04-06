@@ -9,13 +9,13 @@
 
 using namespace std;
 
-enum Ceil_Figure_color
+enum class Ceil_Figure_color
 	{
 		Black,
 		White,
-		none
+		no
 	};
-enum Ceil_Figure_type
+enum class Ceil_Figure_type
 	{
 		K,		//King
 		Q,		//Queen
@@ -30,29 +30,28 @@ struct Cell_prop
 {
 	Cell_prop(){}
 	Cell_prop(Ceil_Figure_color color, Ceil_Figure_type type) : figure_color(color), figure_type(type){}
-	Ceil_Figure_color figure_color = Ceil_Figure_color::none;
+	Ceil_Figure_color figure_color = Ceil_Figure_color::no;
 	Ceil_Figure_type figure_type = Ceil_Figure_type::none;
 
-	ostream& operator << (ostream& os) const;
+	friend ostream& operator << (ostream& os, Cell_prop obj);
 };
 
 class Chess_game
 {
 public:
 	Chess_game();
-	~Chess_game();
-
+	friend ostream& operator<<(ostream& os, Chess_game obj);
 private:
 	Cell_prop chess_board[8][8];
 	bool is_move_white = true;
 
+
 	void start_new_game();
 	
-	template<class T>
+
 	void move_figure(Cell_prop& figure);
 
 	void mover_is_check();
 };
-
 
 #endif // !CHESS_GAME_H
