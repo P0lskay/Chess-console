@@ -6,16 +6,16 @@
 ostream& operator << (ostream& os, Cell_prop obj)
 {
 	
-	//HANDLE  hConsole;
-	//hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-	//if (obj.figure_color == Ceil_Figure_color::White) //Если фигура белая, то она отобразится черным текстом на белом фоне
-	//{
-	//	SetConsoleTextAttribute(hConsole, 255);
-	//}
-	//else							 //Если фигура черная, то она отобразится белым текстом на черном фоне
-	//{
-	//	SetConsoleTextAttribute(hConsole, 15);
-	//}
+	HANDLE  hConsole;
+	hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+	if (obj.figure_color == Ceil_Figure_color::White) //Если фигура белая, то она отобразится черным текстом на белом фоне
+	{
+		SetConsoleTextAttribute(hConsole, 240);
+	}
+	else							 //Если фигура черная, то она отобразится белым текстом на черном фоне
+	{
+		SetConsoleTextAttribute(hConsole, 15);
+	}
 	os << " ";
 	switch (obj.figure_type) //В зависимости от типа фигуры, выводим соответвующую ей букву
 	{
@@ -43,6 +43,7 @@ ostream& operator << (ostream& os, Cell_prop obj)
 	}
 
 	os << " ";
+	SetConsoleTextAttribute(hConsole, 15);
 	return os;
 }
 
