@@ -12,7 +12,7 @@ ostream& operator << (ostream& os, Cell_prop obj)
 	{
 		SetConsoleTextAttribute(hConsole, 240);
 	}
-	else							 //Если фигура черная, то она отобразится белым текстом на черном фоне
+	else							 //Если фигура черная, то она отобразится белым текстом на черном фоне 
 	{
 		SetConsoleTextAttribute(hConsole, 15);
 	}
