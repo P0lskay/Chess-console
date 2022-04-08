@@ -2,7 +2,7 @@
 #ifndef CHESS_GAME_H
 #define CHESS_GAME_H
 
-
+#include <string_view>
 #include <array>
 #include <iostream>
 #include <string>
@@ -52,7 +52,10 @@ private:
 	void make_move();
 
 	//Преобразует строковые координаты в координаты, необходимые для обращения к ячейке chess_board
-	pair<pair<int, int>, pair<int, int>> translate_move_coordinate(string str_coordinate);
+	pair<pair<int, int>, pair<int, int>> translate_move_coordinate(string& str_coordinate);
+
+	//Проверяет координаты введенные пользователем на корректность
+	bool check_str_coordinate(string_view str_coordinate) const;
 
 	void move_figure(Cell_prop& figure);
 

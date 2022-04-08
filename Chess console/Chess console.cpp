@@ -2,6 +2,8 @@
 #include <Windows.h>
 #include <iomanip>
 #include <vector>
+#include <algorithm>
+#include <regex>
 
 ostream& operator << (ostream& os, Cell_prop obj)
 {
@@ -138,9 +140,27 @@ void Chess_game::make_move()
 
 }
 
-pair<pair<int, int>, pair<int, int>> translate_move_coordinate(string str_coordinate)
+pair<pair<int, int>, pair<int, int>> Chess_game::translate_move_coordinate(string& str_coordinate)
 {
 	pair<int, int> start_pos, finish_pos;
+	if (check_str_coordinate(str_coordinate))
+	{	//Удаляем все пробелы из строки, а затем вычисляем координаты клетки в массиве board_chess
+		//static_cast<int>('a') = 97, а static_cast<int>('1') = 49, 
+		//поэтому для получения координат вычитаем 96 и 48 соответсвенно
+		str_coordinate.erase(remove(str_coordinate.begin(), str_coordinate.end(), ' '), str_coordinate.end());
+		start_pos = { static_cast<int>(str_coordinate[0]) - 96, static_cast<int>(str_coordinate[1]) - 48 };
+		finish_pos = { static_cast<int>(str_coordinate[2]) - 96, static_cast<int>(str_coordinate[3]) - 48 };
+	}
+	else
+	{
+		throw exception("Введены неправильные координаты, пожалуйста, проверьте раскладку и попробуйте еще раз.");
+	}
+	return { start_pos, finish_pos };
+}
 
-	for(auto& i : str_coordinate)
+
+bool Chess_game::check_str_coordinate(string_view str_coordinate) const
+{
+	static const regex r(R"(\s+[a-h][1-8]\s+[a-h][1-8]\s+)");
+	return regex_match(str_coordinate.data(), r);
 }
