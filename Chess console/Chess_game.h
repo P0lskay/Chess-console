@@ -45,9 +45,14 @@ private:
 	Cell_prop chess_board[8][8];
 	bool is_move_white = true;
 
-
+	//Постановка всех фигур на начальные позиции
 	void start_new_game();
 	
+	//Метода отвечающий за начало игры и ходы игроков
+	void make_move();
+
+	//Преобразует строковые координаты в координаты, необходимые для обращения к ячейке chess_board
+	pair<pair<int, int>, pair<int, int>> translate_move_coordinate(string str_coordinate);
 
 	void move_figure(Cell_prop& figure);
 

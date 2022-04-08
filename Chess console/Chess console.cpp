@@ -107,3 +107,40 @@ void Chess_game::start_new_game()
 	chess_board[7][3] = Cell_prop(Ceil_Figure_color::Black, Ceil_Figure_type::Q);
 	chess_board[7][4] = Cell_prop(Ceil_Figure_color::Black, Ceil_Figure_type::K);
 }
+
+void Chess_game::make_move()
+{
+	using pair_coordinates = pair<pair<int, int>, pair<int, int>>;
+	pair_coordinates cordinate = { {0, 0}, {0, 0} };
+
+	string moves;
+	cout << ((this->is_move_white) ? "Ход белых: " : "Ход черных: ");
+	getline(cin, moves);
+	try
+	{
+		if (moves == "RESTART")
+		{
+			//НАЧИНАЕМ ИГРУ ЗАНОВО
+		}
+		else if (moves == "END")
+		{
+			//ЗАКАНЧИВАЕМ ИГРУ 
+		}
+		else
+		{
+			pair_coordinates cordinate = translate_move_coordinate(moves);
+		}
+	}
+	catch (exception& ex)
+	{
+
+	}
+
+}
+
+pair<pair<int, int>, pair<int, int>> translate_move_coordinate(string str_coordinate)
+{
+	pair<int, int> start_pos, finish_pos;
+
+	for(auto& i : str_coordinate)
+}
