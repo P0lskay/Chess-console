@@ -161,3 +161,46 @@ bool Chess_game::check_str_coordinate(string_view str_coordinate) const
 	static const regex r(R"(\s+[a-h][1-8]\s+[a-h][1-8]\s+)");
 	return regex_match(str_coordinate.data(), r);
 }
+
+void Chess_game::move_figure(pair<int, int> start_move, pair<int, int> finish_move)
+{
+	if (is_move_white && chess_board[start_move.first][start_move.second].figure_color != Ceil_Figure_color::White ||
+		!is_move_white && chess_board[start_move.first][start_move.second].figure_color != Ceil_Figure_color::Black)
+	{	//Если на позиции, с которой фигура ходит, стоит фигура другого игрока или не стоит фигура вовсе, то бросаем исключение
+		throw exception("На введенной позиции не стоит ваша фигура!");
+	}
+
+	if (chess_board[start_move.first][start_move.second].figure_color == chess_board[finish_move.first][finish_move.second].figure_color)
+	{	//Если игрок пытается сходить на позицию, на которой стоит его фигура, то бросаем исключение
+		throw exception("Вы не можете сходить фигурой туда, где уже стоит ваша фигура!");
+	}
+
+}
+
+bool Chess_game::mover_check(pair<int, int> start_move, pair<int, int> finish_move)
+{
+	if (chess_board[start_move.first][start_move.second].figure_type == Ceil_Figure_type::B)
+	{
+
+	}
+	else if (chess_board[start_move.first][start_move.second].figure_type == Ceil_Figure_type::R)
+	{
+
+	}
+	else if (chess_board[start_move.first][start_move.second].figure_type == Ceil_Figure_type::N)
+	{
+
+	}
+	else if (chess_board[start_move.first][start_move.second].figure_type == Ceil_Figure_type::Q)
+	{
+
+	}
+	else if (chess_board[start_move.first][start_move.second].figure_type == Ceil_Figure_type::p)
+	{
+
+	}
+	else if (chess_board[start_move.first][start_move.second].figure_type == Ceil_Figure_type::K)
+	{
+
+	}
+}

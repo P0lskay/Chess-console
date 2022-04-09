@@ -62,9 +62,18 @@ private:
 	//Проверяет координаты введенные пользователем на корректность
 	bool check_str_coordinate(string_view str_coordinate) const;
 
-	void move_figure(Cell_prop& figure);
+	void move_figure(pair<int, int> start_move, pair<int, int> finish_move);
 
-	void mover_is_check();
+	//Проверяет, может ли фигура сделать ход
+	bool mover_check(pair<int, int> start_move, pair<int, int> finish_move);
+
+	//Проверяют, может ли конкретная фигура сделать данный ход 
+	bool king_mover_check(pair<int, int> start_move, pair<int, int> finish_move);
+	bool queen_mover_check(pair<int, int> start_move, pair<int, int> finish_move);
+	bool bishop_mover_check(pair<int, int> start_move, pair<int, int> finish_move);
+	bool knight_mover_check(pair<int, int> start_move, pair<int, int> finish_move);
+	bool rook_mover_check(pair<int, int> start_move, pair<int, int> finish_move);
+	bool pawn_mover_check(pair<int, int> start_move, pair<int, int> finish_move);
 };
 
 #endif // !CHESS_GAME_H
