@@ -6,6 +6,11 @@
 #include <array>
 #include <iostream>
 #include <string>
+#include <Windows.h>
+#include <iomanip>
+#include <vector>
+#include <algorithm>
+#include <regex>
 
 using namespace std;
 

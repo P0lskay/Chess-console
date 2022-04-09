@@ -1,9 +1,4 @@
 ﻿#include "Chess_game.h"
-#include <Windows.h>
-#include <iomanip>
-#include <vector>
-#include <algorithm>
-#include <regex>
 
 ostream& operator << (ostream& os, Cell_prop obj)
 {
@@ -116,26 +111,28 @@ void Chess_game::make_move()
 	pair_coordinates cordinate = { {0, 0}, {0, 0} };
 
 	string moves;
-	cout << ((this->is_move_white) ? "Ход белых: " : "Ход черных: ");
-	getline(cin, moves);
-	try
+	//Запускаем цикл ходов, пока не произойдет break внутри цикла
+	while (true)
 	{
-		if (moves == "RESTART")
+		cout << ((this->is_move_white) ? "Ход белых: " : "Ход черных: ");
+		getline(cin, moves);
+		try
 		{
-			//НАЧИНАЕМ ИГРУ ЗАНОВО
+			if (moves == "END")
+			{
+				break;
+			}
+			else
+			{
+				pair_coordinates cordinate = translate_move_coordinate(moves);
+			}
 		}
-		else if (moves == "END")
-		{
-			//ЗАКАНЧИВАЕМ ИГРУ 
+		catch (exception& ex)
+		{	//Если введена неверная команда или неверные кординаты, то выводим ошибку
+			//и вновь даем игрокам возможность для ввода
+			cerr << ex.what() << endl;
+			continue;
 		}
-		else
-		{
-			pair_coordinates cordinate = translate_move_coordinate(moves);
-		}
-	}
-	catch (exception& ex)
-	{
-
 	}
 
 }
@@ -153,7 +150,7 @@ pair<pair<int, int>, pair<int, int>> Chess_game::translate_move_coordinate(strin
 	}
 	else
 	{
-		throw exception("Введены неправильные координаты, пожалуйста, проверьте раскладку и попробуйте еще раз.");
+		throw exception("Введены неправильные координаты или команда, пожалуйста, проверьте раскладку и попробуйте еще раз.");
 	}
 	return { start_pos, finish_pos };
 }
