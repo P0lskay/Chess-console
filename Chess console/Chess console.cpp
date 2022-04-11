@@ -2,7 +2,7 @@
 
 ostream& operator << (ostream& os, Cell_prop obj)
 {
-	
+
 	HANDLE  hConsole;
 	hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 	if (obj.figure_color == Ceil_Figure_color::White) //Если фигура белая, то она отобразится черным текстом на белом фоне
@@ -71,8 +71,8 @@ ostream& operator<<(ostream& os, Chess_game obj)
 Chess_game::Chess_game()
 {
 	start_new_game();
-	cout << "Игра началась, первыми ходят белые. Для совершения хода введите в одну строчку: 'e2 e4' - " << 
-			"где e2 - координата, которой соответствует фигура, которая ходит, а e4 - координата клетки, куда данная фигура ходит." << '\n';
+	cout << "Игра началась, первыми ходят белые. Для совершения хода введите в одну строчку: 'e2 e4' - " <<
+		"где e2 - координата, которой соответствует фигура, которая ходит, а e4 - координата клетки, куда данная фигура ходит." << '\n';
 }
 
 void Chess_game::start_new_game()
@@ -152,6 +152,11 @@ pair<pair<int, int>, pair<int, int>> Chess_game::translate_move_coordinate(strin
 	{
 		throw exception("Введены неправильные координаты или команда, пожалуйста, проверьте раскладку и попробуйте еще раз.");
 	}
+
+	if (start_pos == finish_pos)
+	{
+		throw exception("Фигура не может остаться на месте");
+	}
 	return { start_pos, finish_pos };
 }
 
@@ -164,8 +169,7 @@ bool Chess_game::check_str_coordinate(string_view str_coordinate) const
 
 void Chess_game::move_figure(pair<int, int> start_move, pair<int, int> finish_move)
 {
-	if (is_move_white && chess_board[start_move.first][start_move.second].figure_color != Ceil_Figure_color::White ||
-		!is_move_white && chess_board[start_move.first][start_move.second].figure_color != Ceil_Figure_color::Black)
+	if (chess_board[start_move.first][start_move.second].figure_color != (is_move_white ? Ceil_Figure_color::White : Ceil_Figure_color::Black))
 	{	//Если на позиции, с которой фигура ходит, стоит фигура другого игрока или не стоит фигура вовсе, то бросаем исключение
 		throw exception("На введенной позиции не стоит ваша фигура!");
 	}
@@ -222,10 +226,108 @@ bool Chess_game::pawn_mover_check(pair<int, int> start_move, pair<int, int> fini
 	}
 	//Случай, когда игрок ест пешкой вражескую фигуру
 	if (abs(finish_move.first - start_move.first) == 1 && abs(finish_move.second - start_move.second) == 1
-		&& chess_board[finish_move.first][finish_move.second].figure_color == Ceil_Figure_color::Black)
+		&& chess_board[finish_move.first][finish_move.second].figure_color == (is_move_white ? Ceil_Figure_color::Black : Ceil_Figure_color::White))
 	{
 		return true;
 	}
-	
+
+	return false;
+}
+
+bool Chess_game::knight_mover_check(pair<int, int> start_move, pair<int, int> finish_move)
+{
+	if ((abs(finish_move.first - start_move.first) == 2 && abs(finish_move.second - start_move.second) == 1 ||
+		abs(finish_move.first - start_move.first) == 1 && abs(finish_move.second - start_move.second) == 2) &&
+		chess_board[finish_move.first][finish_move.second].figure_color != (is_move_white ? Ceil_Figure_color::White : Ceil_Figure_color::Black))
+	{
+		return true;
+	}
+	return false;
+}
+
+bool Chess_game::rook_mover_check(pair<int, int> start_move, pair<int, int> finish_move)
+{	//У ладьи обязательно после хода одна из координат должна остаться прежней, поэтому
+	//проверяем каждую и итерируемся по другой, проверяя, нет ли на пути ладьи фигур
+	if (start_move.first == finish_move.first)
+	{
+		for (int i = start_move.second + 1; i != finish_move.second; i += (start_move.second < finish_move.second) ? 1 : (-1))
+		{
+			if (chess_board[start_move.first][i].figure_type != Ceil_Figure_type::none)
+			{
+				return false;
+			}
+		}
+		if (chess_board[finish_move.first][finish_move.second].figure_color == (is_move_white ? Ceil_Figure_color::White : Ceil_Figure_color::Black))
+		{
+			return false;
+		}
+	}
+	else if (start_move.second == finish_move.second)
+	{
+		for (int i = start_move.first + 1; i != finish_move.first; i += (start_move.first < finish_move.first) ? 1 : (-1))
+		{
+			if (chess_board[i][start_move.second].figure_type != Ceil_Figure_type::none)
+			{
+				return false;
+			}
+		}
+		if (chess_board[finish_move.first][finish_move.second].figure_color == (is_move_white ? Ceil_Figure_color::White : Ceil_Figure_color::Black))
+		{
+			return false;
+		}
+	}
+	else
+	{
+		return false;
+	}
+	return true;
+}
+
+bool Chess_game::bishop_mover_check(pair<int, int> start_move, pair<int, int> finish_move)
+{	//для передвижения по диагонали слону обязательно нужно передвинуться на одинковое количество клеток по вертикали и горизонтали 
+	if (abs(start_move.first - finish_move.first) == abs(start_move.second - finish_move.second))
+	{
+		for (int i = start_move.first + 1, j = start_move.second + 1; i != finish_move.first; i += (start_move.first < finish_move.first) ? 1 : (-1), j += (start_move.second < finish_move.second) ? 1 : (-1))
+		{
+			if (chess_board[i][j].figure_type != Ceil_Figure_type::none)
+			{
+				return false;
+			}
+		}
+		if (chess_board[finish_move.first][finish_move.second].figure_color == (is_move_white ? Ceil_Figure_color::White : Ceil_Figure_color::Black))
+		{
+			return false;
+		}
+	}
+	else
+	{
+		return false;
+	}
+	return true;
+}
+
+bool Chess_game::queen_mover_check(pair<int, int> start_move, pair<int, int> finish_move)
+{	//Королева может хрдить либо также как слон, либо как ладья,
+	//Поэтому стоит использовать уже написанные методы
+	if (start_move.first == finish_move.first || start_move.second == finish_move.second)
+	{
+		return rook_mover_check(start_move, finish_move);
+	}
+	else if (abs(start_move.first - finish_move.first) == abs(start_move.second - finish_move.second))
+	{
+		return bishop_mover_check(start_move, finish_move);
+	}
+	return false;
+}
+
+
+bool Chess_game::king_mover_check(pair<int, int> start_move, pair<int, int> finish_move)
+{	//Король должен просто переместиться максимум на 1 клетку в любую (или каждую) из сторон,
+	//где нет союзника (проверка на наличие вражеского короля рядом или шаха будет в другой функции
+	if (abs(start_move.first - finish_move.first) <= 1 && abs(start_move.second - finish_move.second) <= 1 &&
+		chess_board[finish_move.first][finish_move.second].figure_color != (is_move_white ? Ceil_Figure_color::White : Ceil_Figure_color::Black))
+	{
+		return true;
+	}
 	return false;
 }
