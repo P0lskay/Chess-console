@@ -185,27 +185,27 @@ bool Chess_game::mover_check(pair<int, int> start_move, pair<int, int> finish_mo
 {
 	if (chess_board[start_move.first][start_move.second].figure_type == Ceil_Figure_type::B)
 	{
-
+		return bishop_mover_check(start_move, finish_move);
 	}
 	else if (chess_board[start_move.first][start_move.second].figure_type == Ceil_Figure_type::R)
 	{
-
+		return rook_mover_check(start_move, finish_move);
 	}
 	else if (chess_board[start_move.first][start_move.second].figure_type == Ceil_Figure_type::N)
 	{
-
+		return knight_mover_check(start_move, finish_move);
 	}
 	else if (chess_board[start_move.first][start_move.second].figure_type == Ceil_Figure_type::Q)
 	{
-
+		return queen_mover_check(start_move, finish_move);
 	}
 	else if (chess_board[start_move.first][start_move.second].figure_type == Ceil_Figure_type::p)
 	{
-
+		return pawn_mover_check(start_move, finish_move);
 	}
 	else if (chess_board[start_move.first][start_move.second].figure_type == Ceil_Figure_type::K)
 	{
-
+		return king_mover_check(start_move, finish_move);
 	}
 }
 
