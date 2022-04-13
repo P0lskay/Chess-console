@@ -1,5 +1,7 @@
 ﻿#include "Chess_game.h"
 
+using pair_coordinates = pair<pair<int, int>, pair<int, int>>;
+
 ostream& operator << (ostream& os, Cell_prop obj)
 {
 
@@ -82,6 +84,7 @@ void Chess_game::start_new_game()
 	chess_board[0][2] = chess_board[0][5] = Cell_prop(Ceil_Figure_color::White, Ceil_Figure_type::B);
 	chess_board[0][3] = Cell_prop(Ceil_Figure_color::White, Ceil_Figure_type::Q);
 	chess_board[0][4] = Cell_prop(Ceil_Figure_color::White, Ceil_Figure_type::K);
+	white_king_coordinate = { 0, 4 };
 	for (int i = 0; i < 8; i++)
 	{
 		chess_board[1][i] = Cell_prop(Ceil_Figure_color::White, Ceil_Figure_type::p);
@@ -103,17 +106,20 @@ void Chess_game::start_new_game()
 	chess_board[7][2] = chess_board[7][5] = Cell_prop(Ceil_Figure_color::Black, Ceil_Figure_type::B);
 	chess_board[7][3] = Cell_prop(Ceil_Figure_color::Black, Ceil_Figure_type::Q);
 	chess_board[7][4] = Cell_prop(Ceil_Figure_color::Black, Ceil_Figure_type::K);
+	black_king_coodinate = { 7, 4 };
+
+	make_move();
 }
 
 void Chess_game::make_move()
 {
-	using pair_coordinates = pair<pair<int, int>, pair<int, int>>;
 	pair_coordinates cordinate = { {0, 0}, {0, 0} };
 
 	string moves;
 	//Запускаем цикл ходов, пока не произойдет break внутри цикла
 	while (true)
 	{
+		cout << *this;
 		cout << ((this->is_move_white) ? "Ход белых: " : "Ход черных: ");
 		getline(cin, moves);
 		try
@@ -125,6 +131,7 @@ void Chess_game::make_move()
 			else
 			{
 				pair_coordinates cordinate = translate_move_coordinate(moves);
+				move_figure(cordinate.first, cordinate.second);
 			}
 		}
 		catch (exception& ex)
@@ -137,7 +144,7 @@ void Chess_game::make_move()
 
 }
 
-pair<pair<int, int>, pair<int, int>> Chess_game::translate_move_coordinate(string& str_coordinate)
+pair_coordinates Chess_game::translate_move_coordinate(string& str_coordinate)
 {
 	pair<int, int> start_pos, finish_pos;
 	if (check_str_coordinate(str_coordinate))
@@ -163,7 +170,7 @@ pair<pair<int, int>, pair<int, int>> Chess_game::translate_move_coordinate(strin
 
 bool Chess_game::check_str_coordinate(string_view str_coordinate) const
 {
-	static const regex r(R"(\s+[a-h][1-8]\s+[a-h][1-8]\s+)");
+	static const regex r(R"(\s*[a-h][1-8]\s+[a-h][1-8]\s*)");
 	return regex_match(str_coordinate.data(), r);
 }
 
@@ -179,6 +186,20 @@ void Chess_game::move_figure(pair<int, int> start_move, pair<int, int> finish_mo
 		throw exception("Вы не можете сходить фигурой туда, где уже стоит ваша фигура!");
 	}
 
+	if (!mover_check(start_move, finish_move))
+	{
+		throw exception("Данная фигура не может так ходить!");
+	}
+
+	if (!check_of_check(start_move, finish_move))
+	{
+		throw exception("После данного хода вашему королю будет шах!");
+	}
+
+	//Если ни одно из исключений не сработало, то перемещаем фигуру
+
+	chess_board[finish_move.first][finish_move.second] = chess_board[start_move.first][start_move.second];
+	chess_board[start_move.first][start_move.second] = { Ceil_Figure_color::no, Ceil_Figure_type::none };
 }
 
 bool Chess_game::mover_check(pair<int, int> start_move, pair<int, int> finish_move)
@@ -207,6 +228,7 @@ bool Chess_game::mover_check(pair<int, int> start_move, pair<int, int> finish_mo
 	{
 		return king_mover_check(start_move, finish_move);
 	}
+	return false;
 }
 
 
@@ -330,4 +352,39 @@ bool Chess_game::king_mover_check(pair<int, int> start_move, pair<int, int> fini
 		return true;
 	}
 	return false;
+}
+
+
+bool Chess_game::check_of_check(pair<int, int> start_move, pair<int, int> finish_move)
+{	//Создаем копию доски и перемещаем фигуру туда, куда хочет сходить игрок
+	auto copy_board = chess_board;
+	copy_board[finish_move.first][finish_move.second] = copy_board[start_move.first][start_move.second];
+	copy_board[start_move.first][start_move.second] = { Ceil_Figure_color::no, Ceil_Figure_type::none };
+	
+	//Проверяем координаты короля после хода
+	pair<int, int> frendly_king_coordinate;
+	if (copy_board[finish_move.first][finish_move.second].figure_type == Ceil_Figure_type::K)
+	{
+		frendly_king_coordinate = { finish_move.first, finish_move.second };
+	}
+	else
+	{
+		frendly_king_coordinate = (is_move_white ? white_king_coordinate : black_king_coodinate);
+	}
+
+	for (int i = 0; i < (sizeof(chess_board) / sizeof(*(chess_board))); i++)
+	{
+		for (int j = 0; j < sizeof(chess_board[i]) / sizeof(*(chess_board[i])); j++)
+		{
+			if (copy_board[i][j].figure_color == (is_move_white ? Ceil_Figure_color::Black : Ceil_Figure_color::White))
+			{
+				if (!mover_check({ i, j }, frendly_king_coordinate))
+				{
+					return false;
+				}
+			}
+		}
+	}
+
+	return true;
 }

@@ -49,6 +49,7 @@ public:
 private:
 	Cell_prop chess_board[8][8];
 	bool is_move_white = true;
+	pair<int, int> black_king_coodinate, white_king_coordinate;
 
 	//ѕостановка всех фигур на начальные позиции
 	void start_new_game();
@@ -74,6 +75,9 @@ private:
 	bool knight_mover_check(pair<int, int> start_move, pair<int, int> finish_move);
 	bool rook_mover_check(pair<int, int> start_move, pair<int, int> finish_move);
 	bool pawn_mover_check(pair<int, int> start_move, pair<int, int> finish_move);
+
+	//ѕроверка: не будет ли после хода дл€ корол€ ходившего шах
+	bool check_of_check(pair<int, int> start_move, pair<int, int> finish_move);
 };
 
 #endif // !CHESS_GAME_H
