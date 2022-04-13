@@ -152,8 +152,8 @@ pair_coordinates Chess_game::translate_move_coordinate(string& str_coordinate)
 		//static_cast<int>('a') = 97, а static_cast<int>('1') = 49, 
 		//поэтому для получения координат вычитаем 97 и 49 соответсвенно
 		str_coordinate.erase(remove(str_coordinate.begin(), str_coordinate.end(), ' '), str_coordinate.end());
-		start_pos = { static_cast<int>(str_coordinate[0]) - 97, static_cast<int>(str_coordinate[1]) - 49 };
-		finish_pos = { static_cast<int>(str_coordinate[2]) - 97, static_cast<int>(str_coordinate[3]) - 49 };
+		start_pos = { static_cast<int>(str_coordinate[1]) - 49, static_cast<int>(str_coordinate[0]) - 97 };
+		finish_pos = { static_cast<int>(str_coordinate[3]) - 49, static_cast<int>(str_coordinate[2]) - 97 };
 	}
 	else
 	{
@@ -235,13 +235,13 @@ bool Chess_game::mover_check(pair<int, int> start_move, pair<int, int> finish_mo
 bool Chess_game::pawn_mover_check(pair<int, int> start_move, pair<int, int> finish_move)
 {
 	//Случай, когда игрок ходит пешкой через 1 поле
-	if (start_move.first == finish_move.first && abs(finish_move.second - start_move.second) == 2 && (start_move.second == 1 || start_move.second == 6)
+	if (start_move.second == finish_move.second && abs(finish_move.first - start_move.first) == 2 && (start_move.first == 1 || start_move.first == 6)
 		&& chess_board[finish_move.first][finish_move.second].figure_color == Ceil_Figure_color::no)
 	{
 		return true;
 	}
 	//Случай, когда игрок ходить пешкой на 1 поле вперед
-	if (start_move.first == finish_move.first && abs(finish_move.second - start_move.second) == 1
+	if (start_move.second == finish_move.second && abs(finish_move.first - start_move.first) == 1
 		&& chess_board[finish_move.first][finish_move.second].figure_color == Ceil_Figure_color::no)
 	{
 		return true;
