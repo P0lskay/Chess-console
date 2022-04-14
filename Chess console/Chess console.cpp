@@ -272,7 +272,7 @@ bool Chess_game::rook_mover_check(pair<int, int> start_move, pair<int, int> fini
 	//проверяем каждую и итерируемся по другой, проверяя, нет ли на пути ладьи фигур
 	if (start_move.first == finish_move.first)
 	{
-		for (int i = start_move.second + 1; i != finish_move.second; i += (start_move.second < finish_move.second) ? 1 : (-1))
+		for (int i = start_move.second + ((start_move.second < finish_move.second) ? 1 : (-1)); i != finish_move.second; i += (start_move.second < finish_move.second) ? 1 : (-1))
 		{
 			if (chess_board[start_move.first][i].figure_type != Ceil_Figure_type::none)
 			{
@@ -286,7 +286,7 @@ bool Chess_game::rook_mover_check(pair<int, int> start_move, pair<int, int> fini
 	}
 	else if (start_move.second == finish_move.second)
 	{
-		for (int i = start_move.first + 1; i != finish_move.first; i += (start_move.first < finish_move.first) ? 1 : (-1))
+		for (int i = start_move.first + ((start_move.first < finish_move.first) ? 1 : (-1)); i != finish_move.first; i += (start_move.first < finish_move.first) ? 1 : (-1))
 		{
 			if (chess_board[i][start_move.second].figure_type != Ceil_Figure_type::none)
 			{
@@ -356,14 +356,16 @@ bool Chess_game::king_mover_check(pair<int, int> start_move, pair<int, int> fini
 
 
 bool Chess_game::check_of_check(pair<int, int> start_move, pair<int, int> finish_move)
-{	//Создаем копию доски и перемещаем фигуру туда, куда хочет сходить игрок
-	auto copy_board = chess_board;
-	copy_board[finish_move.first][finish_move.second] = copy_board[start_move.first][start_move.second];
-	copy_board[start_move.first][start_move.second] = { Ceil_Figure_color::no, Ceil_Figure_type::none };
-	
-	//Проверяем координаты короля после хода
+{
+	//Временно перемещаем фигуру на ту клетку, на которой она должна стоять и меняем очередность хода
+	//НЕ ЗАБЫТЬ ВЕРНУТЬ ЕЕ ОБРАТНО!!!!!
+	chess_board[finish_move.first][finish_move.second] = chess_board[start_move.first][start_move.second];
+	chess_board[start_move.first][start_move.second] = { Ceil_Figure_color::no, Ceil_Figure_type::none };
+	is_move_white = false;
+
+	//Проверяем ходит ли сейчас король
 	pair<int, int> frendly_king_coordinate;
-	if (copy_board[finish_move.first][finish_move.second].figure_type == Ceil_Figure_type::K)
+	if (chess_board[finish_move.first][finish_move.second].figure_type == Ceil_Figure_type::K)
 	{
 		frendly_king_coordinate = { finish_move.first, finish_move.second };
 	}
@@ -376,15 +378,23 @@ bool Chess_game::check_of_check(pair<int, int> start_move, pair<int, int> finish
 	{
 		for (int j = 0; j < sizeof(chess_board[i]) / sizeof(*(chess_board[i])); j++)
 		{
-			if (copy_board[i][j].figure_color == (is_move_white ? Ceil_Figure_color::Black : Ceil_Figure_color::White))
+			if (chess_board[i][j].figure_color == (is_move_white ? Ceil_Figure_color::White : Ceil_Figure_color::Black))
 			{
-				if (!mover_check({ i, j }, frendly_king_coordinate))
+				if (mover_check({ i, j }, frendly_king_coordinate))
 				{
+					//Перед возвратом функции нужно вернуть фигуру обратно
+					chess_board[start_move.first][start_move.second] = chess_board[finish_move.first][finish_move.second];
+					chess_board[finish_move.first][finish_move.second] = { Ceil_Figure_color::no, Ceil_Figure_type::none };
+					is_move_white = true;
 					return false;
 				}
 			}
 		}
 	}
 
+	//Перед возвратом функции нужно вернуть фигуру обратно
+	chess_board[start_move.first][start_move.second] = chess_board[finish_move.first][finish_move.second];
+	chess_board[finish_move.first][finish_move.second] = { Ceil_Figure_color::no, Ceil_Figure_type::none };
+	is_move_white = true;
 	return true;
 }
