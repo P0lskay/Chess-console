@@ -204,6 +204,7 @@ void Chess_game::move_figure(pair<int, int> start_move, pair<int, int> finish_mo
 	{
 		(is_move_white ? white_king_coordinate : black_king_coodinate) = finish_move;
 	}
+	is_move_white = !is_move_white;
 }
 
 bool Chess_game::mover_check(pair<int, int> start_move, pair<int, int> finish_move)
@@ -370,7 +371,7 @@ bool Chess_game::check_of_check(pair<int, int> start_move, pair<int, int> finish
 	//НЕ ЗАБЫТЬ ВЕРНУТЬ ЕЕ ОБРАТНО!!!!!
 	chess_board[finish_move.first][finish_move.second] = chess_board[start_move.first][start_move.second];
 	chess_board[start_move.first][start_move.second] = { Ceil_Figure_color::no, Ceil_Figure_type::none };
-	is_move_white = false;
+	is_move_white = !is_move_white;
 
 	//Проверяем ходит ли сейчас король
 	pair<int, int> frendly_king_coordinate;
@@ -394,7 +395,7 @@ bool Chess_game::check_of_check(pair<int, int> start_move, pair<int, int> finish
 					//Перед возвратом функции нужно вернуть фигуру обратно
 					chess_board[start_move.first][start_move.second] = chess_board[finish_move.first][finish_move.second];
 					chess_board[finish_move.first][finish_move.second] = { Ceil_Figure_color::no, Ceil_Figure_type::none };
-					is_move_white = true;
+					is_move_white = !is_move_white;
 					return false;
 				}
 			}
@@ -404,6 +405,6 @@ bool Chess_game::check_of_check(pair<int, int> start_move, pair<int, int> finish
 	//Перед возвратом функции нужно вернуть фигуру обратно
 	chess_board[start_move.first][start_move.second] = chess_board[finish_move.first][finish_move.second];
 	chess_board[finish_move.first][finish_move.second] = { Ceil_Figure_color::no, Ceil_Figure_type::none };
-	is_move_white = true;
+	is_move_white = !is_move_white;
 	return true;
 }
