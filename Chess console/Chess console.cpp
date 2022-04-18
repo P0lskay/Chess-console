@@ -174,6 +174,15 @@ bool Chess_game::check_str_coordinate(string_view str_coordinate) const
 	return regex_match(str_coordinate.data(), r);
 }
 
+
+bool Chess_game :: check_int_coordinate(int start_coordinate, int finish_coordinate) const
+{
+	if (start_coordinate >= 0 && start_coordinate <= 7 && finish_coordinate >= 0 && finish_coordinate <= 7)
+		return true;
+	return false;
+
+}
+
 void Chess_game::move_figure(pair<int, int> start_move, pair<int, int> finish_move)
 {
 	if (chess_board[start_move.first][start_move.second].figure_color != (is_move_white ? Ceil_Figure_color::White : Ceil_Figure_color::Black))
@@ -205,6 +214,12 @@ void Chess_game::move_figure(pair<int, int> start_move, pair<int, int> finish_mo
 		(is_move_white ? white_king_coordinate : black_king_coodinate) = finish_move;
 	}
 	is_move_white = !is_move_white;
+
+	//После хода проверяем, не произошло ли мата.
+	if (!check_of_check_mate())
+	{
+		throw exception("ШАХ И МАТ!");
+	}
 }
 
 bool Chess_game::mover_check(pair<int, int> start_move, pair<int, int> finish_move)
@@ -365,6 +380,24 @@ bool Chess_game::king_mover_check(pair<int, int> start_move, pair<int, int> fini
 }
 
 
+bool Chess_game::check_of_check(pair<int, int> king_coordinate)
+{
+	for (int i = 0; i < (sizeof(chess_board) / sizeof(*(chess_board))); i++)
+	{
+		for (int j = 0; j < sizeof(chess_board[i]) / sizeof(*(chess_board[i])); j++)
+		{
+			if (chess_board[i][j].figure_color == (is_move_white ? Ceil_Figure_color::Black : Ceil_Figure_color::White))
+			{
+				if (mover_check({ i, j }, king_coordinate))
+				{
+					return false;
+				}
+			}
+		}
+	}
+	return true;
+}
+
 bool Chess_game::check_of_check(pair<int, int> start_move, pair<int, int> finish_move)
 {
 	//Временно перемещаем фигуру на ту клетку, на которой она должна стоять и меняем очередность хода
@@ -407,4 +440,67 @@ bool Chess_game::check_of_check(pair<int, int> start_move, pair<int, int> finish
 	chess_board[finish_move.first][finish_move.second] = { Ceil_Figure_color::no, Ceil_Figure_type::none };
 	is_move_white = !is_move_white;
 	return true;
+}
+
+
+bool Chess_game::check_of_check_mate()
+{// Алгоритм:
+ //1) координаты короля = (получаем координаты для проверяемого короля) - done
+ //2) Проверка 8 клеток вокруг короля, есть ли на них шах. - done
+ //3) Создаем или берем френдли фигуру
+ //4) Проверяем, будет ли шах при перемещении ее на различнчые клетки
+ //5) Если шаха нет, то добавляем координаты клетки в вектор
+ //6) Удаляем френдли фигуру, если мы ее создали
+ //7) Для всех остальных френди фигур проверяем, способны ли они переместиться на одну из тех координат и будет ли шах после перемещения
+ //8) Если ни одна фигура не подойдет, то это мат
+
+	pair<int, int> king_coordinate = (is_move_white ? white_king_coordinate : black_king_coodinate);
+	//Проверяем есть ли шах королю
+	if (check_of_check(king_coordinate))
+	{
+		return true;
+	}
+
+	if (check_int_coordinate(king_coordinate.first+1, king_coordinate.second+1))
+	{
+		if (check_of_check({ king_coordinate.first + 1, king_coordinate.second + 1 }))
+		{
+			return true;
+		}
+	}
+	if(check_int_coordinate(king_coordinate.first, king_coordinate.second + 1))
+	{
+		if (check_of_check({ king_coordinate.first, king_coordinate.second + 1 }))
+		{
+			return true;
+		}
+	}
+	if (check_int_coordinate(king_coordinate.first + 1, king_coordinate.second))
+	{
+		if (check_of_check({ king_coordinate.first + 1, king_coordinate.second }))
+		{
+			return true;
+		}
+	}
+	if (check_int_coordinate(king_coordinate.first, king_coordinate.second - 1))
+	{
+		if (check_of_check({ king_coordinate.first, king_coordinate.second - 1 }))
+		{
+			return true;
+		}
+	}
+	if (check_int_coordinate(king_coordinate.first - 1, king_coordinate.second))
+	{
+		if (check_of_check({ king_coordinate.first - 1, king_coordinate.second }))
+		{
+			return true;
+		}
+	}
+	if (check_int_coordinate(king_coordinate.first - 1, king_coordinate.second-1))
+	{
+		if (check_of_check({ king_coordinate.first - 1, king_coordinate.second - 1 }))
+		{
+			return true;
+		}
+	}
 }

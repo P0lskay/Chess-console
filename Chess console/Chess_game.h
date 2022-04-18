@@ -62,6 +62,8 @@ private:
 
 	//Проверяет координаты введенные пользователем на корректность
 	bool check_str_coordinate(string_view str_coordinate) const;
+	//Проверяет измененные координаты в виде чисел
+	bool check_int_coordinate(int start_coordinate, int finish_coordinate) const;
 
 	void move_figure(pair<int, int> start_move, pair<int, int> finish_move);
 
@@ -78,6 +80,12 @@ private:
 
 	//Проверка: не будет ли после хода для короля ходившего шах
 	bool check_of_check(pair<int, int> start_move, pair<int, int> finish_move);
+
+	//Проверка: нет ли шаха на определенной клетке
+	bool check_of_check(pair<int, int> king_coordinate);
+
+	//Проверка на шах и мат
+	bool check_of_check_mate();
 };
 
 #endif // !CHESS_GAME_H
