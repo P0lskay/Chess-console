@@ -447,15 +447,15 @@ bool Chess_game::check_of_check_mate()
 {// Алгоритм:
  //1) координаты короля = (получаем координаты для проверяемого короля) - done
  //2) Проверка 8 клеток вокруг короля, есть ли на них шах. - done
- //3) Создаем или берем френдли фигуру
- //4) Проверяем, будет ли шах при перемещении ее на различнчые клетки
- //5) Если шаха нет, то добавляем координаты клетки в вектор
- //6) Удаляем френдли фигуру, если мы ее создали
- //7) Для всех остальных френди фигур проверяем, способны ли они переместиться на одну из тех координат и будет ли шах после перемещения
- //8) Если ни одна фигура не подойдет, то это мат
+ //3) Создаем френдли фигуру - done
+ //4) Проверяем, будет ли шах при перемещении ее на различнчые клетки - done
+ //5) Если шаха нет, то добавляем координаты клетки в вектор - done
+ //6) Удаляем френдли фигуру, если мы ее создали -done
+ //7) Для всех остальных френди фигур проверяем, способны ли они переместиться на одну из тех координат и будет ли шах после перемещения -done
+ //8) Если ни одна фигура не подойдет, то это мат -done 
 
 	pair<int, int> king_coordinate = (is_move_white ? white_king_coordinate : black_king_coodinate);
-	
+	vector<pair<int, int>> ceils_for_check;
 	//Проверка на угрозу шаха королю впринципе
 	if (check_of_check(king_coordinate))
 	{
@@ -477,17 +477,17 @@ bool Chess_game::check_of_check_mate()
 		}
 	}
 
-	//Создаем или берем френдли фигуру на поле 
-	pair<int, int> frendly_figure = { -1, - 1 };
-	Cell_prop old_cell;																										//Переменная для запоминания старого значения клетки
+	//Создаем френдли фигуру на поле 
+	pair<int, int> frendly_figure = { -1, -1 };																								//Переменная для запоминания старого значения клетки
 	for (int i = 0; i < (sizeof(chess_board) / sizeof(*(chess_board))); i++)
 	{
 		for (int j = 0; j < sizeof(chess_board[i]) / sizeof(*(chess_board[i])); j++)
 		{
-			if (chess_board[i][j].figure_color == (is_move_white ? Ceil_Figure_color::White : Ceil_Figure_color::Black) || chess_board[i][j].figure_color == Ceil_Figure_color::no )
+			if (chess_board[i][j].figure_color == Ceil_Figure_color::no )
 			{
-				old_cell = chess_board[i][j];
 				frendly_figure = { i, j };
+				//Создаем временную френди фигуру на найденом поле
+				chess_board[i][j] = { (is_move_white ? Ceil_Figure_color::White : Ceil_Figure_color::Black), Ceil_Figure_type::Q };
 				break;
 			}
 		}
@@ -495,4 +495,41 @@ bool Chess_game::check_of_check_mate()
 		if (frendly_figure.first > -1)
 			break;
 	}
+
+	//Обходим все поле и добавляем все клетки при перемещении на которые шаха нет
+	for (int i = 0; i < (sizeof(chess_board) / sizeof(*(chess_board))); i++)
+	{
+		for (int j = 0; j < sizeof(chess_board[i]) / sizeof(*(chess_board[i])); j++)
+		{
+			if (check_of_check(frendly_figure, {i, j}))
+			{
+				ceils_for_check.push_back({ i, j });
+			}
+		}
+	}
+
+	//Нужно проверить, не произойдет ли переполнения массива при попытке вернуть созданную френди клетку к исходному значению
+	if (frendly_figure.first >= 0 && frendly_figure.first <= 7 && frendly_figure.second <= 7 && frendly_figure.second >= 0)
+		chess_board[frendly_figure.first][frendly_figure.second] = { Ceil_Figure_color::no, Ceil_Figure_type::none };
+	else
+		throw exception("Ошибка при расчете шах и мата");
+
+	//Ищем все союзные фигуры и пробуем передвинуть их на клетки "отменяющие" шах
+	for (int i = 0; i < (sizeof(chess_board) / sizeof(*(chess_board))); i++)
+	{
+		for (int j = 0; j < sizeof(chess_board[i]) / sizeof(*(chess_board[i])); j++)
+		{
+			if (chess_board[i][j].figure_color == (is_move_white ? Ceil_Figure_color::White : Ceil_Figure_color::Black))
+			{
+				for (auto& k : ceils_for_check)
+				{
+					if (mover_check({ i, j }, k) && check_of_check({ i, j }, k))
+					{
+						return true;
+					}
+				}
+			}
+		}
+	}
+	return false;
 }
