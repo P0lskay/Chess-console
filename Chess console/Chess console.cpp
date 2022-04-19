@@ -455,52 +455,44 @@ bool Chess_game::check_of_check_mate()
  //8) Если ни одна фигура не подойдет, то это мат
 
 	pair<int, int> king_coordinate = (is_move_white ? white_king_coordinate : black_king_coodinate);
-	//Проверяем есть ли шах королю
+	
+	//Проверка на угрозу шаха королю впринципе
 	if (check_of_check(king_coordinate))
 	{
 		return true;
 	}
 
-	if (check_int_coordinate(king_coordinate.first+1, king_coordinate.second+1))
+	//Проверка 8 клеток вокруг короля на возможность уйти от шаха
+	for (int i = -1; i <= 1; i++)
 	{
-		if (check_of_check({ king_coordinate.first + 1, king_coordinate.second + 1 }))
+		for (int j = -1; j <= 1; j++)
 		{
-			return true;
+			if (check_int_coordinate(king_coordinate.first + i, king_coordinate.second + j))
+			{
+				if (mover_check(king_coordinate, { king_coordinate.first + i, king_coordinate.second + j }) && check_of_check({ king_coordinate.first + i, king_coordinate.second + j }))
+				{
+					return true;
+				}
+			}
 		}
 	}
-	if(check_int_coordinate(king_coordinate.first, king_coordinate.second + 1))
+
+	//Создаем или берем френдли фигуру на поле 
+	pair<int, int> frendly_figure = { -1, - 1 };
+	Cell_prop old_cell;																										//Переменная для запоминания старого значения клетки
+	for (int i = 0; i < (sizeof(chess_board) / sizeof(*(chess_board))); i++)
 	{
-		if (check_of_check({ king_coordinate.first, king_coordinate.second + 1 }))
+		for (int j = 0; j < sizeof(chess_board[i]) / sizeof(*(chess_board[i])); j++)
 		{
-			return true;
+			if (chess_board[i][j].figure_color == (is_move_white ? Ceil_Figure_color::White : Ceil_Figure_color::Black) || chess_board[i][j].figure_color == Ceil_Figure_color::no )
+			{
+				old_cell = chess_board[i][j];
+				frendly_figure = { i, j };
+				break;
+			}
 		}
-	}
-	if (check_int_coordinate(king_coordinate.first + 1, king_coordinate.second))
-	{
-		if (check_of_check({ king_coordinate.first + 1, king_coordinate.second }))
-		{
-			return true;
-		}
-	}
-	if (check_int_coordinate(king_coordinate.first, king_coordinate.second - 1))
-	{
-		if (check_of_check({ king_coordinate.first, king_coordinate.second - 1 }))
-		{
-			return true;
-		}
-	}
-	if (check_int_coordinate(king_coordinate.first - 1, king_coordinate.second))
-	{
-		if (check_of_check({ king_coordinate.first - 1, king_coordinate.second }))
-		{
-			return true;
-		}
-	}
-	if (check_int_coordinate(king_coordinate.first - 1, king_coordinate.second-1))
-	{
-		if (check_of_check({ king_coordinate.first - 1, king_coordinate.second - 1 }))
-		{
-			return true;
-		}
+		//Если мы нашли и клетку для френли фигуры, то выходим из цикла
+		if (frendly_figure.first > -1)
+			break;
 	}
 }
