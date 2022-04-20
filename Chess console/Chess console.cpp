@@ -406,7 +406,9 @@ bool Chess_game::check_of_check(pair<int, int> start_move, pair<int, int> finish
 {
 	//Временно перемещаем фигуру на ту клетку, на которой она должна стоять и меняем очередность хода
 	//НЕ ЗАБЫТЬ ВЕРНУТЬ ЕЕ ОБРАТНО!!!!!
+	Cell_prop copy_ceil = { chess_board[finish_move.first][finish_move.second].figure_color, chess_board[finish_move.first][finish_move.second].figure_type };
 	chess_board[finish_move.first][finish_move.second] = chess_board[start_move.first][start_move.second];
+	
 	chess_board[start_move.first][start_move.second] = { Ceil_Figure_color::no, Ceil_Figure_type::none };
 	is_move_white = !is_move_white;
 
@@ -431,7 +433,7 @@ bool Chess_game::check_of_check(pair<int, int> start_move, pair<int, int> finish
 				{
 					//Перед возвратом функции нужно вернуть фигуру обратно
 					chess_board[start_move.first][start_move.second] = chess_board[finish_move.first][finish_move.second];
-					chess_board[finish_move.first][finish_move.second] = { Ceil_Figure_color::no, Ceil_Figure_type::none };
+					chess_board[finish_move.first][finish_move.second] = copy_ceil;
 					is_move_white = !is_move_white;
 					return false;
 				}
@@ -441,7 +443,7 @@ bool Chess_game::check_of_check(pair<int, int> start_move, pair<int, int> finish
 
 	//Перед возвратом функции нужно вернуть фигуру обратно
 	chess_board[start_move.first][start_move.second] = chess_board[finish_move.first][finish_move.second];
-	chess_board[finish_move.first][finish_move.second] = { Ceil_Figure_color::no, Ceil_Figure_type::none };
+	chess_board[finish_move.first][finish_move.second] = copy_ceil;
 	is_move_white = !is_move_white;
 	return true;
 }
@@ -473,7 +475,7 @@ bool Chess_game::check_of_check_mate()
 		{
 			if (check_int_coordinate(king_coordinate.first + i, king_coordinate.second + j))
 			{
-				if (mover_check(king_coordinate, { king_coordinate.first + i, king_coordinate.second + j }) && check_of_check({ king_coordinate.first + i, king_coordinate.second + j }))
+				if (mover_check(king_coordinate, { king_coordinate.first + i, king_coordinate.second + j }) && check_of_check(king_coordinate, { king_coordinate.first + i, king_coordinate.second + j }))
 				{
 					return true;
 				}
