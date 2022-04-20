@@ -336,7 +336,8 @@ bool Chess_game::bishop_mover_check(pair<int, int> start_move, pair<int, int> fi
 			i != finish_move.first; 
 			i += (start_move.first < finish_move.first) ? 1 : (-1), j += (start_move.second < finish_move.second) ? 1 : (-1))
 		{
-			if (chess_board[i][j].figure_type != Ceil_Figure_type::none)
+			if (chess_board[i][j].figure_type != Ceil_Figure_type::none &&
+				i != finish_move.first && j != finish_move.second)
 			{
 				return false;
 			}
@@ -382,19 +383,22 @@ bool Chess_game::king_mover_check(pair<int, int> start_move, pair<int, int> fini
 
 bool Chess_game::check_of_check(pair<int, int> king_coordinate)
 {
+	is_move_white = !is_move_white;
 	for (int i = 0; i < (sizeof(chess_board) / sizeof(*(chess_board))); i++)
 	{
 		for (int j = 0; j < sizeof(chess_board[i]) / sizeof(*(chess_board[i])); j++)
 		{
-			if (chess_board[i][j].figure_color == (is_move_white ? Ceil_Figure_color::Black : Ceil_Figure_color::White))
+			if (chess_board[i][j].figure_color == (is_move_white ? Ceil_Figure_color::White : Ceil_Figure_color::Black))
 			{
 				if (mover_check({ i, j }, king_coordinate))
 				{
+					is_move_white = !is_move_white;
 					return false;
 				}
 			}
 		}
 	}
+	is_move_white = !is_move_white;
 	return true;
 }
 
